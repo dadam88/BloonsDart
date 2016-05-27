@@ -92,7 +92,9 @@ def generate():
 
 def launch(power):
     particle = Particle((pygame.mouse.get_pos()), 20)
-    particle.speed = 5 * power
+    particle.speed = 1 * power
+    # 5 too fast at moment, something to play aruond with is power and base speed
+    # particle.speed = 5 * power
     particle.angle = 45
 
     return particle
@@ -100,6 +102,8 @@ def launch(power):
 running = True
 channelpower = False
 power = 0
+powerup = True
+powerdown = False
 
 while running:
     for event in pygame.event.get():
@@ -124,8 +128,19 @@ while running:
 
     if pygame.mouse.get_pressed()[0] != 1:
         channelpower = False
+
     if channelpower:
-        power += .01
+        if power >= 10:
+            powerup = False
+            powerdown = True
+        else:
+            if power <= 0:
+                powerup = True
+                powerdown = False
+    	if powerup:
+	    	power += .05
+        else:
+        	power -= .05
         print power
 
     screen.fill(background_colour)
@@ -142,7 +157,7 @@ while running:
 
     # print len(my_particles)
     # print addVectors((100,5),(20,5))
-
-
+    (mouseX, mouseY) = pygame.mouse.get_pos()
+    pygame.draw.lines(screen, (0,0,0), False, [(mouseX, mouseY), (mouseX+ (10*power), mouseY-(10*power))], 1)
     clock.tick(200)
     pygame.display.flip()
