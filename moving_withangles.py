@@ -3,7 +3,9 @@ import random
 import math
 
 background_colour = (255,255,255)
-(width, height) = (1080 , 500)
+(width, height) = (300 , 500)
+
+(originx, originy) = (0, 250)
 
 clock = pygame.time.Clock()
 
@@ -90,12 +92,12 @@ def generate():
     return particle
         # my_particles.append(particle)
 
-def launch(power):
+def launch(power, angle):
     particle = Particle((pygame.mouse.get_pos()), 20)
     particle.speed = 1 * power
     # 5 too fast at moment, something to play aruond with is power and base speed
     # particle.speed = 5 * power
-    particle.angle = 45
+    particle.angle = angle
 
     return particle
 
@@ -123,7 +125,7 @@ while running:
                 channelpower = True                
 
             if pygame.mouse.get_pressed()[2] == 1:
-                my_particles.append(launch(power))
+                my_particles.append(launch(power, angletobe))
                 power = 0
 
     if pygame.mouse.get_pressed()[0] != 1:
@@ -158,6 +160,20 @@ while running:
     # print len(my_particles)
     # print addVectors((100,5),(20,5))
     (mouseX, mouseY) = pygame.mouse.get_pos()
-    pygame.draw.lines(screen, (0,0,0), False, [(mouseX, mouseY), (mouseX+ (10*power), mouseY-(10*power))], 1)
+
+    dx = mouseX - originx
+    dy = mouseY - originy
+    
+    # adding 0.5 and pi works nice. fixes angle issue I was having
+    angletobe = math.atan2(dy, dx) + 0.5*math.pi
+
+    # pygame.draw.lines(screen, (0,0,0), False, [(0, 250), (mouseX, mouseY)], 1)
+    pygame.draw.lines(screen, (0,0,0), False, [(originx, originy), (originx + math.sin(angletobe) * 10 * 10, originy - math.cos(angletobe) * 10 * 10)], 1)
+    pygame.draw.lines(screen, (255,0,0), False, [(mouseX, mouseY), (mouseX + math.sin(angletobe) * 10 * power, mouseY - math.cos(angletobe) * 10 * power)], 1)
+
+    # self.x += math.sin(self.angle) * self.speed
+
+
+    # pygame.draw.lines(screen, (0,0,0), False, [(0, 250), (mouseX+ (10*power), mouseY-(10*power))], 1)
     clock.tick(200)
     pygame.display.flip()
